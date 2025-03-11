@@ -15,15 +15,22 @@ end
 
 
 a.logSalePrice = log.(a.SalePrice)
-a.prob = a.Order .- 0.5 ./ length(a.SalePrice)
-a.prob2 = quantile(Normal(0.0, 1.0), a.prob)
-sorted = sort(a.SalePrice)  
+
+
+sorted = sort(a.logSalePrice)  
 sorted = normalize(sorted)
 
+prbs = [(i - 0.5) / length(a.Order) for i in a.Order]
+th = quantile(Normal(0.0, 1.0), prbs) 
 
 
-y = quantile(sorted, [i / 1000 for i in range(1, 999)])
-x = quantile(Normal(0.0, 1.0), [i / 1000 for i in range(1, 999)])
 
-plot(scatter(x, y), qqplot( rand(Normal(), 1000), sorted))
+probs = range(0.000, 1, length=999)  # 999 points from 0.001 to 0.999
+x = quantile(Normal(0.0, 1.0), probs)    # Theoretical quantiles (X-axis)
+y = quantile(sorted, probs)
 
+plot(scatter(th, prbs))
+
+
+
+plot(scatter(sorted, th), qqplot(y, x))
